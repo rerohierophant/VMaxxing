@@ -1,0 +1,68 @@
+# VMaxxing Scheduled Research — crontab template (Route A)
+# =================================================================
+#
+# This file provides ready-to-use crontab entries that call
+# ``vmx -p "<prompt>"`` on a schedule. Each line runs a
+# separate one-shot research task; the results are written to
+# ``agent/runs/`` just like a normal interactive run.
+#
+# INSTALL:
+#   1. Copy the lines you want into your crontab:
+#        crontab -e
+#   2. Replace <AGENT_DIR> with the absolute path to your vmx
+#      agent directory (e.g. /Users/tianle/Desktop/VMaxxing/agent).
+#   3. Replace <PYTHON> with your Python binary path.
+#   4. Adjust the prompts and schedules to your needs.
+#
+# ADVANCED (recommended):
+#   For full lifecycle management (add/list/pause/resume/delete jobs,
+#   persistent store, crash recovery, email notifications), use the
+#   ``watch`` daemon instead:
+#       export VIBE_TRADING_ENABLE_SCHEDULER=1
+#       vmx watch
+#   Then manage jobs with:
+#       vmx schedule add <id> <prompt> <schedule>
+#       vmx schedule list
+#
+# SCHEDULE REFERENCE (crontab format):
+#   minute  hour  day-of-month  month  day-of-week  command
+#   *       *     *             *      *            (every minute)
+#   0       9     *             *      1            (Monday 9am)
+#   30      16    *             *      1-5          (Weekdays 4:30pm)
+#   0       */6   *             *      *            (Every 6 hours)
+#   */30    *     *             *      *            (Every 30 minutes)
+#
+# =================================================================
+
+AGENT_DIR=<AGENT_DIR>
+PYTHON=<PYTHON>
+
+# --- Example 1: Weekly sector scan every Monday at 9:00 AM ---
+# Scans a sector and writes a research memo.
+# 0 9 * * 1 cd $AGENT_DIR && $PYTHON -m cli -p "Scan the semiconductor sector: find top 5 momentum stocks, analyze recent earnings, and flag any unusual volume activity. Write a concise weekly scan report." --no-rich
+
+# --- Example 2: Daily after-close momentum scan (Mon-Fri 4:30 PM) ---
+# 30 16 * * 1-5 cd $AGENT_DIR && $PYTHON -m cli -p "Run a daily momentum scan on S&P 500: identify stocks with RSI(14) crossing above 50, 20-day SMA breakout, and above-average volume. Rank by momentum score." --no-rich
+
+# --- Example 3: Hourly anomaly detection ---
+# 0 * * * * cd $AGENT_DIR && $PYTHON -m cli -p "Check for market anomalies in the last hour: unusual volume spikes (>3x average), price gaps >2%, and sudden volatility changes in major indices." --no-rich
+
+# --- Example 4: Every 30 minutes price alert check ---
+# */30 * * * * cd $AGENT_DIR && $PYTHON -m cli -p "Check if any stocks in my watchlist (AAPL, NVDA, TSLA, MSFT, GOOGL) have moved more than 2% in the last 30 minutes. Flag any breakouts or breakdowns." --no-rich
+
+# --- Example 5: Weekend portfolio review (Sunday 6:00 PM) ---
+# 0 18 * * 0 cd $AGENT_DIR && $PYTHON -m cli -p "Generate a weekly portfolio review: summarize major market events, review key positions, calculate portfolio performance metrics, and suggest rebalancing actions for next week." --no-rich
+
+# --- Example 6: Pre-market briefing (Mon-Fri 8:30 AM) ---
+# 30 8 * * 1-5 cd $AGENT_DIR && $PYTHON -m cli -p "Pre-market briefing: summarize overnight futures movement, check pre-market gainers/losers, review any after-hours earnings reports, and highlight key economic events for the day." --no-rich
+
+# =================================================================
+# LOGGING (optional but recommended)
+#
+# Append ``>> /tmp/vmx-cron.log 2>&1`` to capture output:
+#
+# 0 9 * * 1 cd $AGENT_DIR && $PYTHON -m cli -p "Scan..." --no-rich >> /tmp/vmx-cron.log 2>&1
+#
+# TIP: Use ``--json`` instead of ``--no-rich`` for machine-readable output
+# that can be piped into downstream tooling (Slack, email, database, etc.).
+# =================================================================
